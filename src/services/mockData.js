@@ -14,7 +14,7 @@ export const mockPayments = [
   { id: "pay-1", customer_id: "c-1", amount: 800, method: "mpesa", status: "successful", reference: "TAP-A1B2C3D4E5", created_at: new Date(Date.now() - 86400000).toISOString() },
   { id: "pay-2", customer_id: "c-2", amount: 1500, method: "airtel", status: "successful", reference: "TAP-F6G7H8I9J0", created_at: new Date(Date.now() - 172800000).toISOString() },
   { id: "pay-3", customer_id: "c-3", amount: 50, method: "mpesa", status: "pending", reference: "TAP-K1L2M3N4O5", created_at: new Date(Date.now() - 3600000).toISOString() },
-  { id: "pay-4", customer_id: "c-4", amount: 250, method: "stripe", status: "failed", reference: "TAP-P6Q7R8S9T0", created_at: new Date(Date.now() - 259200000).toISOString() },
+  { id: "pay-4", customer_id: "c-4", amount: 250, method: "mpesa", status: "failed", reference: "TAP-P6Q7R8S9T0", created_at: new Date(Date.now() - 259200000).toISOString() },
 ];
 export const mockSubscriptions = [
   { id: "sub-1", customer_id: "c-1", package: mockPackages[2], status: "active", start_date: new Date(Date.now() - 604800000).toISOString(), expiry_date: new Date(Date.now() + 2000000000).toISOString(), price_paid: 800 },

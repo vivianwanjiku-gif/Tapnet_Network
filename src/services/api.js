@@ -74,12 +74,7 @@ async function mockRequest(method, url, body) {
   }
   if (path === "/payments" && method === "get") return { data: db.payments.filter((p) => p.customer_id === "c-1") };
   if (path === "/payments/initiate") {
-    const pkg = db.packages.find((p) => p.id === body.package_id);
-    const payment = { id: "pay-" + Date.now(), customer_id: "c-1", amount: pkg.price, method: body.method, status: "successful", reference: genRef(), created_at: new Date().toISOString() };
-    db.payments.unshift(payment);
-    const sub = { id: "sub-" + Date.now(), customer_id: "c-1", package: pkg, status: "active", start_date: new Date().toISOString(), expiry_date: new Date(Date.now() + pkg.duration_days * 86400000).toISOString(), price_paid: pkg.price };
-    db.subscriptions.unshift(sub);
-    return { data: payment };
+    return { data: { error: "Use /api/payments/initiate. A package starts only after M-Pesa or Airtel Money confirms payment." } };
   }
   if (path === "/admin/dashboard") {
     const revenue = db.payments.filter((p) => p.status === "successful").reduce((s, p) => s + p.amount, 0);

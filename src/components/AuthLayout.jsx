@@ -21,7 +21,7 @@ export default function AuthLayout({ title, lede, children, aside }) {
           <p className="font-display text-4xl leading-tight xl:text-5xl">{aside}</p>
           <ul className="mt-8 space-y-3 text-sm text-mist">
             <li>Plans from KSh 50 a day</li>
-            <li>M-Pesa, Airtel Money, card, or cash</li>
+            <li>M-Pesa or Airtel Money, confirmed before the line starts</li>
             <li>Usage, devices, and support in one account</li>
           </ul>
         </div>

@@ -3,7 +3,6 @@
 from flask import jsonify, request
 from flask_jwt_extended import get_jwt_identity
 
-from extensions import db
 from models.payment import Payment
 
 
@@ -20,57 +19,14 @@ def payment_to_dict(payment):
     }
 
 
-# Validate a payment request and record it for the authenticated user.
+# Refuse to record a completed payment without a provider confirmation.
 def create_payment():
-    user_id = get_jwt_identity()
-
-    data = request.get_json()
-
-    if not data:
-        return jsonify({
-            "message": "No data provided"
-        }), 400
-
-    amount = data.get("amount")
-    payment_method = data.get("payment_method")
-    transaction_id = data.get("transaction_id")
-
-    if (
-        amount is None
-        or not payment_method
-        or not transaction_id
-    ):
-        return jsonify({
-            "message": (
-                "Amount, payment method and "
-                "transaction ID are required"
-            )
-        }), 400
-
-    existing_payment = Payment.query.filter_by(
-        transaction_id=transaction_id
-    ).first()
-
-    if existing_payment:
-        return jsonify({
-            "message": "Transaction ID already exists"
-        }), 409
-
-    payment = Payment(
-        user_id=int(user_id),
-        amount=amount,
-        payment_method=payment_method,
-        transaction_id=transaction_id,
-        status="completed"
-    )
-
-    db.session.add(payment)
-    db.session.commit()
-
     return jsonify({
-        "message": "Payment recorded successfully",
-        "payment": payment_to_dict(payment)
-    }), 201
+        "message": (
+            "Payments are confirmed by Safaricom or IntaSend. "
+            "Start one from the website at /api/payments/initiate."
+        )
+    }), 501
 
 
 # Return the authenticated user’s payments in newest-first order.
