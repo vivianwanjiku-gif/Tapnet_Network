@@ -1,34 +1,52 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import PageHeader from "../../components/PageHeader";
+import { kes } from "../../lib/format";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+
+const cards = [
+  { key: "total_customers", label: "Customers" },
+  { key: "active_subscriptions", label: "Active subscriptions" },
+  { key: "open_tickets", label: "Open tickets" },
+  { key: "total_revenue", label: "Revenue", money: true },
+];
+
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
   const [revenue, setRevenue] = useState([]);
   useEffect(() => {
-    api.get("/admin/dashboard").then((r) => setStats(r.data));
-    api.get("/admin/reports/revenue").then((r) => setRevenue(r.data));
+    api.get("/admin/dashboard").then((response) => setStats(response.data));
+    api.get("/admin/reports/revenue").then((response) => setRevenue(response.data));
   }, []);
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-      <div className="grid md:grid-cols-4 gap-6">
-        <div className="card"><div className="text-sm text-slate-500">Customers</div><div className="text-3xl font-bold">{stats?.total_customers ?? "—"}</div></div>
-        <div className="card"><div className="text-sm text-slate-500">Active Subs</div><div className="text-3xl font-bold">{stats?.active_subscriptions ?? "—"}</div></div>
-        <div className="card"><div className="text-sm text-slate-500">Open Tickets</div><div className="text-3xl font-bold">{stats?.open_tickets ?? "—"}</div></div>
-        <div className="card"><div className="text-sm text-slate-500">Revenue</div><div className="text-3xl font-bold">KSh {stats?.total_revenue?.toLocaleString() ?? "—"}</div></div>
+    <div className="space-y-8">
+      <PageHeader title="Admin dashboard" lede="Customers, live subscriptions, open tickets, and what has been collected." />
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {cards.map((card) => (
+          <article key={card.key} className="card">
+            <p className="text-sm text-ink-faint">{card.label}</p>
+            <p className="mt-3 font-display text-4xl">
+              {stats ? (card.money ? kes(stats[card.key]) : stats[card.key]) : "—"}
+            </p>
+          </article>
+        ))}
       </div>
-      <div className="card">
-        <h2 className="text-lg font-semibold mb-4">Revenue</h2>
-        <div style={{ height: 260 }}>
+      <section className="card">
+        <h2 className="text-lg font-semibold">Revenue</h2>
+        <p className="mt-1 text-sm text-ink-soft">Successful collections by month.</p>
+        <div className="mt-4 h-72">
           <ResponsiveContainer>
             <LineChart data={revenue}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="period" /><YAxis /><Tooltip />
-              <Line type="monotone" dataKey="revenue" stroke="#1e6fd9" strokeWidth={2} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4dcd0" />
+              <XAxis dataKey="period" tick={{ fill: "#4e5c66", fontSize: 12 }} />
+              <YAxis tick={{ fill: "#4e5c66", fontSize: 12 }} />
+              <Tooltip />
+              <Line type="monotone" dataKey="revenue" stroke="#0e7c71" strokeWidth={2.5} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -1,27 +1,41 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
+import PageHeader from "../../components/PageHeader";
+
 const statusClass = { online: "badge-success", offline: "badge-danger", maintenance: "badge-warning" };
+
 export default function AdminNetwork() {
   const [routers, setRouters] = useState([]);
-  const load = () => api.get("/network/routers").then((r) => setRouters(r.data));
+  const load = () => api.get("/network/routers").then((response) => setRouters(response.data));
   useEffect(() => { load(); }, []);
-  const setStatus = async (r, status) => { await api.put(`/network/routers/${r.id}`, { status }); load(); };
+  const setStatus = async (router, status) => {
+    await api.put(`/network/routers/${router.id}`, { status });
+    load();
+  };
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Network</h1>
-      <div className="grid md:grid-cols-3 gap-6">
-        {routers.map((r) => (
-          <div key={r.id} className="card">
-            <div className="flex justify-between">
-              <div><div className="font-medium">{r.name}</div><div className="text-xs font-mono text-slate-500">{r.ip_address}</div></div>
-              <span className={statusClass[r.status] || "badge-gray"}>{r.status}</span>
+    <div className="space-y-8">
+      <PageHeader title="Network" lede="Mark a router online or offline. Capacity stays on the record." />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {routers.map((router) => (
+          <article key={router.id} className="card">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="font-semibold">{router.name}</h2>
+                <p className="font-mono text-xs text-ink-faint">{router.ip_address}</p>
+              </div>
+              <span className={statusClass[router.status] || "badge-gray"}>{router.status}</span>
             </div>
-            <div className="text-sm text-slate-600 mt-3">📍 {r.location}</div>
-            <div className="flex gap-2 mt-4">
-              <button onClick={() => setStatus(r, "online")} className="text-xs px-2 py-1 rounded bg-green-50 text-green-700">Online</button>
-              <button onClick={() => setStatus(r, "offline")} className="text-xs px-2 py-1 rounded bg-red-50 text-red-700">Offline</button>
+            <dl className="mt-4 space-y-1 text-sm text-ink-soft">
+              <div className="flex justify-between"><dt>Location</dt><dd>{router.location}</dd></div>
+              <div className="flex justify-between"><dt>Capacity</dt><dd>{router.bandwidth_capacity_mbps} Mbps</dd></div>
+              <div className="flex justify-between gap-4"><dt>MAC</dt><dd className="font-mono text-xs">{router.mac_address}</dd></div>
+            </dl>
+            <div className="mt-4 flex gap-2">
+              <button type="button" onClick={() => setStatus(router, "online")} className="rounded-full bg-signal-50 px-3 py-1.5 text-xs font-semibold text-signal-800">Online</button>
+              <button type="button" onClick={() => setStatus(router, "offline")} className="rounded-full bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-800">Offline</button>
             </div>
-          </div>
+          </article>
         ))}
       </div>
     </div>

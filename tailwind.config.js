@@ -4,16 +4,45 @@ export default {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: "#eef6ff",
-          100: "#d9ebff",
-          500: "#1e6fd9",
-          600: "#1554a8",
-          700: "#0f3f7d",
-          900: "#082446",
+        ink: {
+          DEFAULT: "#101820",
+          soft: "#3e4c55",
+          faint: "#4e5c66",
+        },
+        paper: {
+          DEFAULT: "#f3f0e8",
+          raised: "#fffcf6",
+        },
+        line: "#e4dcd0",
+        mist: "#d5e0da",
+        signal: {
+          50: "#e7f6f3",
+          100: "#c9ebe4",
+          200: "#96d6cb",
+          300: "#5ec4b4",
+          400: "#2cb8a6",
+          500: "#149a8c",
+          600: "#0e7c71",
+          700: "#0c6159",
+          800: "#0a4842",
+          900: "#08332f",
+        },
+        ember: {
+          DEFAULT: "#c2410c",
+          soft: "#fff1e8",
         },
       },
-      fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] },
+      fontFamily: {
+        sans: ["Outfit", "Segoe UI", "sans-serif"],
+        display: ["Fraunces", "Iowan Old Style", "Palatino", "serif"],
+      },
+      boxShadow: {
+        card: "0 1px 0 rgba(16, 24, 32, 0.04)",
+        lift: "0 18px 40px -24px rgba(16, 24, 32, 0.45)",
+      },
+      maxWidth: {
+        page: "72rem",
+      },
     },
   },
   plugins: [],

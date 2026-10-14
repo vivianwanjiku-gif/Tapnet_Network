@@ -1,24 +1,35 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
+import PageHeader from "../../components/PageHeader";
+import { formatWhen } from "../../lib/format";
+
 export default function AdminAuditLogs() {
   const [logs, setLogs] = useState([]);
-  useEffect(() => { api.get("/admin/audit-logs").then((r) => setLogs(r.data)); }, []);
+  useEffect(() => { api.get("/admin/audit-logs").then((response) => setLogs(response.data)); }, []);
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Audit Logs</h1>
-      <div className="card overflow-hidden p-0">
-        <table className="w-full text-sm">
-          <thead className="bg-slate-50 text-left"><tr>
-            <th className="px-4 py-3">Time</th><th className="px-4 py-3">Actor</th>
-            <th className="px-4 py-3">Action</th><th className="px-4 py-3">Entity</th>
-          </tr></thead>
+    <div className="space-y-8">
+      <PageHeader title="Audit logs" lede="Who changed a package, a customer, or another record." />
+      <div className="card overflow-x-auto p-0">
+        <table className="data-table">
+          <caption className="sr-only">Audit logs</caption>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Actor</th>
+              <th>Action</th>
+              <th>Entity</th>
+              <th>IP</th>
+            </tr>
+          </thead>
           <tbody>
-            {logs.map((l) => (
-              <tr key={l.id} className="border-t">
-                <td className="px-4 py-3 text-xs">{new Date(l.created_at).toLocaleString()}</td>
-                <td className="px-4 py-3 font-mono text-xs">{l.actor_id}</td>
-                <td className="px-4 py-3">{l.action}</td>
-                <td className="px-4 py-3 text-xs text-slate-500">{l.entity_type}</td>
+            {logs.map((log) => (
+              <tr key={log.id}>
+                <td className="text-ink-soft">{formatWhen(log.created_at)}</td>
+                <td className="font-mono text-xs">{log.actor_id}</td>
+                <td>{log.action}</td>
+                <td className="text-ink-soft">{log.entity_type} · {log.entity_id}</td>
+                <td className="font-mono text-xs">{log.ip_address}</td>
               </tr>
             ))}
           </tbody>

@@ -1,6 +1,8 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Landing from "./pages/Landing";
+import Plans from "./pages/Plans";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -16,15 +18,20 @@ import Devices from "./pages/customer/Devices";
 import Notifications from "./pages/customer/Notifications";
 import AdminLayout from "./layouts/AdminLayout";
 import AdminLogin from "./pages/admin/AdminLogin";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminCustomers from "./pages/admin/AdminCustomers";
 import AdminPackages from "./pages/admin/AdminPackages";
 import AdminSubscriptions from "./pages/admin/AdminSubscriptions";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminNetwork from "./pages/admin/AdminNetwork";
-import AdminReports from "./pages/admin/AdminReports";
 import AdminTickets from "./pages/admin/AdminTickets";
 import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
+
+const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminReports = lazy(() => import("./pages/admin/AdminReports"));
+
+function ChartPage({ children }) {
+  return <Suspense fallback={<p className="text-ink-soft" role="status">Loading report…</p>}>{children}</Suspense>;
+}
 
 function RequireAuth({ children, role }) {
   const user = useSelector((s) => s.auth.user);
@@ -40,6 +47,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/plans" element={<Plans />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -56,13 +64,13 @@ export default function App() {
       </Route>
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route element={<RequireAuth role="admin"><AdminLayout /></RequireAuth>}>
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/dashboard" element={<ChartPage><AdminDashboard /></ChartPage>} />
         <Route path="/admin/customers" element={<AdminCustomers />} />
         <Route path="/admin/packages" element={<AdminPackages />} />
         <Route path="/admin/subscriptions" element={<AdminSubscriptions />} />
         <Route path="/admin/payments" element={<AdminPayments />} />
         <Route path="/admin/network" element={<AdminNetwork />} />
-        <Route path="/admin/reports" element={<AdminReports />} />
+        <Route path="/admin/reports" element={<ChartPage><AdminReports /></ChartPage>} />
         <Route path="/admin/tickets" element={<AdminTickets />} />
         <Route path="/admin/audit-logs" element={<AdminAuditLogs />} />
       </Route>

@@ -1,29 +1,31 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
+import PageHeader from "../../components/PageHeader";
+import Icon from "../../components/Icon";
 
 export default function Devices() {
   const [devices, setDevices] = useState([]);
-  useEffect(() => { api.get("/customer/devices").then((r) => setDevices(r.data)); }, []);
+  useEffect(() => { api.get("/customer/devices").then((response) => setDevices(response.data)); }, []);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Connected Devices</h1>
-      <div className="grid md:grid-cols-3 gap-6">
-        {devices.map((d) => (
-          <div key={d.id} className="card">
+    <div className="space-y-8">
+      <PageHeader title="Connected devices" lede="Phones and computers that last joined this line." />
+      {devices.length === 0 && <p className="text-sm text-ink-soft">No devices yet.</p>}
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {devices.map((device) => (
+          <article key={device.id} className="card">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center text-lg">📱</div>
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-signal-50 text-signal-700">
+                <Icon name="device" />
+              </span>
               <div>
-                <div className="font-medium">{d.device_name}</div>
-                <div className="text-xs text-slate-500 font-mono">{d.mac_address}</div>
+                <h2 className="font-medium">{device.device_name}</h2>
+                <p className="font-mono text-xs text-ink-faint">{device.mac_address}</p>
               </div>
             </div>
-            <div className="text-xs text-slate-500 mt-3">
-              Last connected: {new Date(d.last_connected).toLocaleString()}
-            </div>
-          </div>
+            <p className="mt-4 text-xs text-ink-soft">Last connected {new Date(device.last_connected).toLocaleString("en-KE")}</p>
+          </article>
         ))}
-        {devices.length === 0 && <p className="text-sm text-slate-500">No devices.</p>}
       </div>
     </div>
   );

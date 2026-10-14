@@ -1,26 +1,53 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { login } from "../../store/authSlice";
+import AuthLayout from "../../components/AuthLayout";
+
 export default function AdminLogin() {
   const [email, setEmail] = useState("admin@tapnet.co.ke");
   const [password, setPassword] = useState("password");
-  const dispatch = useDispatch(); const navigate = useNavigate();
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    await dispatch(login({ email, password, admin: true })).unwrap();
-    navigate("/admin/dashboard");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError("");
+    try {
+      await dispatch(login({ email, password, admin: true })).unwrap();
+      navigate("/admin/dashboard");
+    } catch (err) {
+      setError(err?.message || "Could not sign in.");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 p-8">
-      <form onSubmit={onSubmit} className="w-full max-w-sm bg-white rounded-lg p-8">
-        <div className="text-2xl font-bold text-brand-700">TapNet Admin</div>
-        <div className="mt-6 space-y-4">
-          <div><label className="label">Email</label><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
-          <div><label className="label">Password</label><input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+    <AuthLayout
+      title="Staff sign in"
+      lede="Customers, packages, subscriptions, payments, and the network live in the admin console."
+      aside="The console is for TapNet staff. Customer accounts use the other sign-in."
+    >
+      <form onSubmit={onSubmit} className="space-y-4">
+        {error && <div className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">{error}</div>}
+        <div>
+          <label className="label" htmlFor="admin-email">Email</label>
+          <input id="admin-email" className="input" type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} required />
         </div>
-        <button className="btn-primary w-full mt-6">Sign in</button>
+        <div>
+          <label className="label" htmlFor="admin-password">Password</label>
+          <input id="admin-password" className="input" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+        </div>
+        <p className="text-xs text-ink-faint">Preview staff sign-in is filled in. This demo does not use a real password store.</p>
+        <button className="btn-primary w-full" disabled={submitting}>{submitting ? "Signing in…" : "Sign in"}</button>
       </form>
-    </div>
+      <p className="mt-6 text-sm text-ink-soft">
+        Customer instead? <Link to="/login" className="link">Use the customer sign-in</Link>
+      </p>
+    </AuthLayout>
   );
 }
