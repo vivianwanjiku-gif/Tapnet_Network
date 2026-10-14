@@ -1,35 +1,62 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { login } from "../store/authSlice";
+import AuthLayout from "../components/AuthLayout";
 
 export default function Login() {
   const [email, setEmail] = useState("john@example.com");
   const [password, setPassword] = useState("password");
+  const [params] = useSearchParams();
+  const packageId = params.get("package_id");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((s) => s.auth);
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const { loading, error } = useSelector((state) => state.auth);
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
     try {
       const user = await dispatch(login({ email, password })).unwrap();
-      navigate(user.role === "customer" ? "/dashboard" : "/admin/dashboard");
-    } catch {}
+      if (user.role === "customer") {
+        navigate(packageId ? `/pay?package_id=${packageId}` : "/dashboard");
+      } else {
+        navigate("/admin/dashboard");
+      }
+    } catch {
+      /* error is stored on the auth slice */
+    }
   };
+
+  const registerTo = packageId ? `/register?package_id=${encodeURIComponent(packageId)}` : "/register";
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 bg-slate-50">
-      <form onSubmit={onSubmit} className="w-full max-w-sm card">
-        <h1 className="text-3xl font-bold">Sign in</h1>
-        <p className="text-slate-500 mt-1 text-sm">Enter your credentials.</p>
-        {error && <div className="mt-4 text-sm text-red-600">{error}</div>}
-        <div className="mt-6 space-y-4">
-          <div><label className="label">Email</label><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
-          <div><label className="label">Password</label><input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+    <AuthLayout
+      title="Sign in"
+      lede={packageId ? "Sign in to finish subscribing. You will land on the payment screen for the plan you chose." : "Use your TapNet account to pay, check usage, and talk to support."}
+      aside="Your line, your balance, and the next renewal — in one place."
+    >
+      <form onSubmit={onSubmit} className="space-y-4">
+        {error && <div className="rounded-xl bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">{error}</div>}
+        <div>
+          <label className="label" htmlFor="email">Email</label>
+          <input id="email" className="input" type="email" autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} required />
         </div>
-        <button disabled={loading} className="btn-primary w-full mt-6">{loading ? "Signing in..." : "Sign in"}</button>
-        <p className="mt-4 text-xs text-center text-slate-500">Don't have an account? <Link to="/register" className="text-brand-600">Register</Link></p>
-        <p className="mt-2 text-xs text-center text-slate-500">Admin? <Link to="/admin/login" className="text-brand-600">Sign in here</Link></p>
+        <div>
+          <div className="flex items-center justify-between">
+            <label className="label mb-0" htmlFor="password">Password</label>
+            <Link to="/forgot-password" className="text-sm link">Forgot password?</Link>
+          </div>
+          <input id="password" className="input mt-1.5" type="password" autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+        </div>
+        <p className="text-xs text-ink-faint">Preview sign-in is filled in for you. This demo accepts the account shown here.</p>
+        <button disabled={loading} className="btn-primary w-full">{loading ? "Signing in…" : "Sign in"}</button>
       </form>
-    </div>
+      <p className="mt-6 text-sm text-ink-soft">
+        New to TapNet? <Link to={registerTo} className="link">Create an account</Link>
+      </p>
+      <p className="mt-2 text-sm text-ink-soft">
+        Staff? <Link to="/admin/login" className="link">Open the admin console</Link>
+      </p>
+    </AuthLayout>
   );
 }

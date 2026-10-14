@@ -1,28 +1,44 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../services/api";
+import AuthLayout from "../components/AuthLayout";
+
 export default function ForgotPassword() {
   const [id, setId] = useState("");
   const [sent, setSent] = useState(false);
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    await api.post("/auth/forgot-password", { email: id, phone: id });
-    setSent(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  const onSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    try {
+      await api.post("/auth/forgot-password", { email: id, phone: id });
+      setSent(true);
+    } finally {
+      setSubmitting(false);
+    }
   };
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-8 bg-slate-50">
-      <form onSubmit={onSubmit} className="w-full max-w-md card">
-        <h1 className="text-2xl font-bold">Reset password</h1>
-        {sent ? (
-          <div className="mt-6 bg-green-50 border border-green-200 text-green-800 p-4 rounded-md text-sm">If an account exists, reset instructions have been sent.</div>
-        ) : (
-          <>
-            <div className="mt-6"><label className="label">Email or Phone</label><input className="input" value={id} onChange={(e) => setId(e.target.value)} required /></div>
-            <button className="btn-primary w-full mt-6">Send instructions</button>
-          </>
-        )}
-        <p className="mt-6 text-sm text-center"><Link to="/login" className="text-brand-600">Back to sign in</Link></p>
-      </form>
-    </div>
+    <AuthLayout
+      title="Reset password"
+      lede="Enter the email or phone on the account. If it matches, reset instructions are sent."
+      aside="We only send a reset when the email or phone is already on an account."
+    >
+      {sent ? (
+        <div className="rounded-2xl border border-signal-200 bg-signal-50 px-4 py-4 text-sm text-signal-800" role="status">
+          If an account exists, reset instructions have been sent.
+        </div>
+      ) : (
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div>
+            <label className="label" htmlFor="identifier">Email or phone</label>
+            <input id="identifier" className="input" value={id} onChange={(event) => setId(event.target.value)} required />
+          </div>
+          <button className="btn-primary w-full" disabled={submitting}>{submitting ? "Sending…" : "Send instructions"}</button>
+        </form>
+      )}
+      <p className="mt-6 text-sm"><Link to="/login" className="link">Back to sign in</Link></p>
+    </AuthLayout>
   );
 }

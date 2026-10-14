@@ -1,28 +1,47 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
+import PageHeader from "../../components/PageHeader";
+
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  useEffect(() => { api.get("/customer/dashboard").then((r) => setData(r.data)); }, []);
-  if (!data) return <div>Loading...</div>;
-  const sub = data.subscription; const pkg = data.current_package; const isActive = data.internet_status === "ONLINE";
+  useEffect(() => { api.get("/customer/dashboard").then((response) => setData(response.data)); }, []);
+  if (!data) return <p role="status" className="text-ink-soft">Loading your line…</p>;
+
+  const sub = data.subscription;
+  const pkg = data.current_package;
+  const isActive = data.internet_status === "ONLINE";
+
   return (
-    <div className="space-y-6">
-      <div><h1 className="text-3xl font-bold">Dashboard</h1><p className="text-slate-500">Your internet at a glance.</p></div>
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="card"><div className="text-sm text-slate-500">Status</div><div className={`mt-2 text-2xl font-bold ${isActive ? "text-green-600" : "text-red-600"}`}>{data.internet_status}</div></div>
-        <div className="card"><div className="text-sm text-slate-500">Package</div><div className="mt-2 text-2xl font-bold">{pkg?.name || "None"}</div></div>
-        <div className="card"><div className="text-sm text-slate-500">Expires</div><div className="mt-2 text-2xl font-bold">{sub?.expiry_date ? new Date(sub.expiry_date).toLocaleDateString() : "—"}</div></div>
+    <div className="space-y-8">
+      <PageHeader title="Dashboard" lede="Your connection, the package on it, and when it expires." />
+      <div className="grid gap-4 md:grid-cols-3">
+        <article className="card">
+          <p className="text-sm text-ink-faint">Status</p>
+          <p className={`mt-3 font-display text-4xl ${isActive ? "text-signal-700" : "text-red-700"}`}>{data.internet_status}</p>
+          <p className="mt-2 text-sm text-ink-soft">{isActive ? "The line is active." : "Buy a package to come back online."}</p>
+        </article>
+        <article className="card">
+          <p className="text-sm text-ink-faint">Package</p>
+          <p className="mt-3 font-display text-4xl">{pkg?.name || "None"}</p>
+          <p className="mt-2 text-sm text-ink-soft">{pkg ? `${pkg.speed_mbps} Mbps` : "No package selected yet."}</p>
+        </article>
+        <article className="card">
+          <p className="text-sm text-ink-faint">Expires</p>
+          <p className="mt-3 font-display text-4xl">{sub?.expiry_date ? new Date(sub.expiry_date).toLocaleDateString("en-KE", { day: "numeric", month: "short" }) : "—"}</p>
+          <p className="mt-2 text-sm text-ink-soft">{sub?.expiry_date ? new Date(sub.expiry_date).getFullYear() : "Renew after you subscribe."}</p>
+        </article>
       </div>
-      <div className="card">
-        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="flex flex-wrap gap-3">
-          <Link to="/packages" className="btn-primary">Buy Package</Link>
-          <Link to="/pay" className="btn-secondary">Make Payment</Link>
-          <Link to="/usage" className="btn-secondary">View Usage</Link>
-          <Link to="/support" className="btn-secondary">Support</Link>
+      <section className="card">
+        <h2 className="text-lg font-semibold">Quick actions</h2>
+        <p className="mt-1 text-sm text-ink-soft">The things people open this account to do.</p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <Link to="/packages" className="btn-primary">Buy a package</Link>
+          <Link to="/pay" className="btn-secondary">Make a payment</Link>
+          <Link to="/usage" className="btn-secondary">View usage</Link>
+          <Link to="/support" className="btn-secondary">Get support</Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

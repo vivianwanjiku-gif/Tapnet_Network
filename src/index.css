@@ -3,23 +3,197 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-800 antialiased;
-    font-family: Inter, system-ui, sans-serif;
+    @apply bg-paper text-ink antialiased;
+    font-family: Outfit, "Segoe UI", sans-serif;
+  }
+
+  ::selection {
+    background: #96d6cb;
+    color: #101820;
+  }
+
+  :focus-visible {
+    outline: 2px solid #2cb8a6;
+    outline-offset: 3px;
+  }
+
+  section[id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
   }
 }
 
 @layer components {
-  .btn { @apply inline-flex items-center justify-center px-4 py-2 rounded-md font-medium transition-colors text-sm; }
-  .btn-primary { @apply btn bg-brand-600 text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed; }
-  .btn-secondary { @apply btn bg-white border border-slate-300 text-slate-700 hover:bg-slate-50; }
-  .card { @apply bg-white rounded-lg shadow-sm border border-slate-200 p-6; }
-  .input { @apply w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm; }
-  .label { @apply block text-sm font-medium text-slate-700 mb-1; }
-  .badge { @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium; }
-  .badge-success { @apply badge bg-green-100 text-green-800; }
-  .badge-warning { @apply badge bg-yellow-100 text-yellow-800; }
-  .badge-danger { @apply badge bg-red-100 text-red-800; }
-  .badge-info { @apply badge bg-blue-100 text-blue-800; }
-  .badge-gray { @apply badge bg-slate-100 text-slate-700; }
+  .skip-link {
+    @apply absolute left-4 z-[80] -top-16 rounded-full bg-paper px-4 py-2 text-sm font-semibold text-ink shadow-lift;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition duration-200;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink text-paper hover:bg-signal-700 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply btn border border-line bg-paper-raised text-ink hover:border-ink/30;
+  }
+
+  .btn-light {
+    @apply btn bg-paper text-ink hover:bg-white;
+  }
+
+  .btn-ghost {
+    @apply btn border border-white/25 text-paper hover:bg-white/10;
+  }
+
+  .card {
+    @apply rounded-2xl border border-line bg-paper-raised p-6 shadow-card;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-line bg-paper-raised px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-faint;
+  }
+
+  .input:disabled {
+    @apply cursor-not-allowed bg-paper text-ink-soft;
+  }
+
+  .label {
+    @apply mb-1.5 block text-sm font-medium text-ink;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize;
+  }
+
+  .badge-success {
+    @apply badge bg-signal-50 text-signal-800;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-100 text-amber-950;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-100 text-red-800;
+  }
+
+  .badge-info {
+    @apply badge bg-sky-100 text-sky-950;
+  }
+
+  .badge-gray {
+    @apply badge bg-ink/5 text-ink-soft;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-signal-700;
+  }
+
+  .eyebrow-light {
+    @apply text-xs font-semibold uppercase tracking-[0.18em] text-signal-200;
+  }
+
+  .display {
+    @apply font-display tracking-tight text-ink;
+  }
+
+  .link {
+    @apply font-semibold text-signal-700 underline-offset-4 hover:underline;
+  }
+
+  .data-table {
+    @apply w-full min-w-[40rem] text-sm;
+  }
+
+  .data-table thead {
+    @apply bg-paper text-left text-xs uppercase tracking-wide text-ink-faint;
+  }
+
+  .data-table th,
+  .data-table td {
+    @apply px-4 py-3 align-middle;
+  }
+
+  .data-table tbody tr {
+    @apply border-t border-line;
+  }
+
+  .plan-card {
+    @apply flex h-full flex-col rounded-3xl border border-line bg-paper-raised p-6 shadow-card transition duration-200 hover:-translate-y-1 hover:shadow-lift;
+  }
+
+  .hero-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 252, 246, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 252, 246, 0.05) 1px, transparent 1px);
+    background-size: 52px 52px;
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 75%);
+  }
+
+  .rise {
+    animation: rise 0.7s ease both;
+  }
+
+  .rise-2 {
+    animation-delay: 120ms;
+  }
+
+  .rise-3 {
+    animation-delay: 220ms;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.86);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.28);
+    opacity: 0;
+  }
+}
+
+.pulse-ring {
+  animation: pulse-ring 6.5s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

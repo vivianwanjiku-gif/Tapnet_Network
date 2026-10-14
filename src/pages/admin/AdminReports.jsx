@@ -1,23 +1,28 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import PageHeader from "../../components/PageHeader";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+
 export default function AdminReports() {
   const [revenue, setRevenue] = useState([]);
-  useEffect(() => { api.get("/admin/reports/revenue").then((r) => setRevenue(r.data)); }, []);
+  useEffect(() => { api.get("/admin/reports/revenue").then((response) => setRevenue(response.data)); }, []);
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Reports</h1>
-      <div className="card">
-        <div style={{ height: 320 }}>
+    <div className="space-y-8">
+      <PageHeader title="Reports" lede="Monthly revenue from successful payments." />
+      <section className="card">
+        <div className="h-80">
           <ResponsiveContainer>
             <BarChart data={revenue}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis dataKey="period" /><YAxis /><Tooltip />
-              <Bar dataKey="revenue" fill="#1e6fd9" radius={[6, 6, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4dcd0" />
+              <XAxis dataKey="period" tick={{ fill: "#4e5c66", fontSize: 12 }} />
+              <YAxis tick={{ fill: "#4e5c66", fontSize: 12 }} />
+              <Tooltip />
+              <Bar dataKey="revenue" fill="#0e7c71" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
