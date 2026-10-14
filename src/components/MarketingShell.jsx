@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "./Icon";
 import Logo from "./Logo";
+import { whatsappHref } from "../data/site";
 
 const links = [
   { to: "/plans", label: "Plans" },
@@ -84,6 +85,7 @@ function SiteFooter() {
             <li><Link className="hover:text-white" to="/#coverage">Coverage</Link></li>
             <li><Link className="hover:text-white" to="/#faq">Questions</Link></li>
             <li><Link className="hover:text-white" to="/#contact">Contact</Link></li>
+            <li><a className="hover:text-white" href={whatsappHref()} target="_blank" rel="noopener noreferrer">WhatsApp</a></li>
           </ul>
         </div>
         <div>

@@ -9,7 +9,7 @@ function featuredId(plans) {
   return plans.find((plan) => /popular/i.test(plan.description || ""))?.id;
 }
 
-export default function PlanGrid({ mode = "public" }) {
+export default function PlanGrid({ mode = "public", spotlight = false }) {
   const [packages, setPackages] = useState(null);
   const navigate = useNavigate();
 
@@ -48,14 +48,15 @@ export default function PlanGrid({ mode = "public" }) {
           "M-Pesa or Airtel Money",
         ];
         const actionClass = `${featured ? "btn-light" : "btn-primary"} mt-6 w-full`;
+        const spotlightClass = spotlight && featured ? "plan-card-popular" : "";
         return (
           <article
             key={plan.id}
-            className={`plan-card ${featured ? "border-signal-400 bg-ink text-paper hover:border-signal-300" : ""}`}
+            className={`plan-card ${featured ? "border-signal-400 bg-ink text-paper hover:border-signal-300" : ""} ${spotlightClass}`}
           >
             <div className="flex items-center justify-between gap-3">
               <h3 className="font-display text-2xl">{plan.name}</h3>
-              {featured && <span className="rounded-full bg-signal-400 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink">Most chosen</span>}
+              {featured && <span className="rounded-full bg-signal-400 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-ink">Most popular</span>}
             </div>
             {plan.description && (
               <p className={`mt-2 text-sm ${featured ? "text-mist" : "text-ink-soft"}`}>{plan.description}</p>
