@@ -137,6 +137,22 @@
     @apply flex h-full flex-col rounded-3xl border border-line bg-paper-raised p-6 shadow-card transition duration-200 hover:-translate-y-1 hover:shadow-lift;
   }
 
+  .plan-card-popular {
+    background:
+      linear-gradient(#101820, #152028) padding-box,
+      linear-gradient(145deg, #96d6cb, #2cb8a6 42%, #c2410c) border-box;
+    border-color: transparent;
+    box-shadow: 0 28px 60px -32px rgba(20, 154, 140, 0.85);
+  }
+
+  .hero-aurora {
+    background:
+      radial-gradient(ellipse 70% 55% at 8% 18%, rgba(44, 184, 166, 0.55), transparent 58%),
+      radial-gradient(ellipse 46% 42% at 92% 8%, rgba(194, 65, 12, 0.42), transparent 52%),
+      radial-gradient(ellipse 55% 45% at 78% 88%, rgba(12, 97, 89, 0.72), transparent 62%),
+      #101820;
+  }
+
   .hero-grid {
     background-image:
       linear-gradient(to right, rgba(255, 252, 246, 0.05) 1px, transparent 1px),
@@ -182,6 +198,19 @@
 
 .pulse-ring {
   animation: pulse-ring 6.5s ease-out infinite;
+}
+
+.aurora-drift {
+  animation: aurora 16s ease-in-out infinite alternate;
+}
+
+@keyframes aurora {
+  from {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+  to {
+    transform: scale(1.06) translate3d(-1.5%, 1.5%, 0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

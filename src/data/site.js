@@ -1,3 +1,17 @@
+/** Replace with the TapNet WhatsApp desk before launch. Digits only, country code first. */
+export const whatsappNumber = "254711000111";
+
+export function whatsappHref(text = "Hello TapNet, I would like to ask about home internet.") {
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(text)}`;
+}
+
+export const trustSignals = [
+  { label: "Speed", value: "50 Mbps", detail: "Top speed on Premium" },
+  { label: "Uptime", value: "99.9%", detail: "The target we run to" },
+  { label: "Support", value: "24/7", detail: "Tickets and WhatsApp" },
+  { label: "Payments", value: "M-Pesa", detail: "Airtel Money too" },
+];
+
 export const coverageTowns = [
   {
     town: "Nairobi",
@@ -107,6 +121,6 @@ export const faqs = [
   },
   {
     q: "How do I get help?",
-    a: "Sign in and open a support ticket — that keeps the history on the account. You can also use the contact form for coverage questions before you join.",
+    a: "Sign in and open a support ticket so the history stays on the account. You can also WhatsApp the desk, or use the contact form for coverage questions before you join.",
   },
 ];
