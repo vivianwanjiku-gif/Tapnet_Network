@@ -29,7 +29,7 @@ class Payment(db.Model):
     )
 
     # Payment channel used for this transaction.
-    # Values: mpesa | airtel | stripe | cash
+    # Values: mpesa | airtel
     payment_method = db.Column(
         db.String(50),
         nullable=False
@@ -53,15 +53,14 @@ class Payment(db.Model):
     # ---- New fields for gateway integration ----
 
     # Provider-side reference:
-    #   M-Pesa  -> CheckoutRequestID
-    #   Airtel  -> transaction id
-    #   Stripe  -> Checkout Session id
+    #   M-Pesa -> CheckoutRequestID
+    #   Airtel Money via IntaSend -> invoice id
     provider_ref = db.Column(
         db.String(200),
         nullable=True
     )
 
-    # Stripe hosted checkout URL (nullable for other methods).
+    # Kept so existing databases still match this model.
     checkout_url = db.Column(
         db.Text,
         nullable=True

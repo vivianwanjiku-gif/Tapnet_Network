@@ -1,16 +1,23 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
+import { currentSubscription } from "../../services/paymentsApi";
 import PageHeader from "../../components/PageHeader";
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
-  useEffect(() => { api.get("/customer/dashboard").then((response) => setData(response.data)); }, []);
+  const [liveSub, setLiveSub] = useState(null);
+  useEffect(() => {
+    api.get("/customer/dashboard").then((response) => setData(response.data));
+    currentSubscription().then((response) => setLiveSub(response.subscription)).catch(() => setLiveSub(null));
+  }, []);
   if (!data) return <p role="status" className="text-ink-soft">Loading your line…</p>;
 
-  const sub = data.subscription;
-  const pkg = data.current_package;
-  const isActive = data.internet_status === "ONLINE";
+  const sub = liveSub || data.subscription;
+  const pkg = liveSub
+    ? { name: liveSub.package_name, speed_mbps: liveSub.speed_mbps }
+    : data.current_package;
+  const isActive = liveSub ? liveSub.status === "active" : data.internet_status === "ONLINE";
 
   return (
     <div className="space-y-8">
@@ -18,7 +25,7 @@ export default function Dashboard() {
       <div className="grid gap-4 md:grid-cols-3">
         <article className="card">
           <p className="text-sm text-ink-faint">Status</p>
-          <p className={`mt-3 font-display text-4xl ${isActive ? "text-signal-700" : "text-red-700"}`}>{data.internet_status}</p>
+          <p className={`mt-3 font-display text-4xl ${isActive ? "text-signal-700" : "text-red-700"}`}>{isActive ? "ONLINE" : "OFFLINE"}</p>
           <p className="mt-2 text-sm text-ink-soft">{isActive ? "The line is active." : "Buy a package to come back online."}</p>
         </article>
         <article className="card">

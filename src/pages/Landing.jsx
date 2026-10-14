@@ -7,7 +7,7 @@ import { coverageTowns, faqs, reasons, steps, stories } from "../data/site";
 
 const highlights = [
   { label: "Starting at", value: "KSh 50" },
-  { label: "Pay with", value: "M-Pesa" },
+  { label: "Pay with", value: "M-Pesa · Airtel" },
   { label: "Contract", value: "None" },
   { label: "Towns live", value: "4" },
 ];
@@ -45,7 +45,7 @@ export default function Landing() {
               Pay for the days you are actually online.
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-mist">
-              TapNet sells straightforward Wi-Fi across Kenya, from KSh 50 a day. Approve M-Pesa, watch what you use, and renew only when you need the line.
+              TapNet sells straightforward Wi-Fi across Kenya, from KSh 50 a day. Approve an M-Pesa or Airtel Money prompt, watch what you use, and renew only when you need the line.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/plans" className="btn-light">

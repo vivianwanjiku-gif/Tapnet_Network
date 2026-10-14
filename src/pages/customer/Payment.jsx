@@ -1,77 +1,81 @@
-import { useEffect, useRef, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import api from "../../services/api";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { paymentPackages, paymentStatus, startPayment } from "../../services/paymentsApi";
 import PageHeader from "../../components/PageHeader";
 import { kes } from "../../lib/format";
 
+const methods = [
+  { id: "mpesa", label: "M-Pesa", hint: "Daraja STK push" },
+  { id: "airtel", label: "Airtel Money", hint: "IntaSend prompt" },
+];
+
 export default function Payment() {
   const [params] = useSearchParams();
-  const navigate = useNavigate();
   const packageId = params.get("package_id");
-
   const [packages, setPackages] = useState([]);
   const [selected, setSelected] = useState(packageId || "");
-  const [phone, setPhone] = useState("254712345678");
+  const [phone, setPhone] = useState("0712345678");
   const [method, setMethod] = useState("mpesa");
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState(null);
-  const redirectTimer = useRef(null);
-
-  useEffect(() => () => clearTimeout(redirectTimer.current), []);
 
   useEffect(() => {
-    api.get("/packages").then((response) => {
-      setPackages(response.data);
-      if (!selected && response.data[0]) setSelected(response.data[0].id);
+    paymentPackages().then((data) => {
+      const plans = data.packages || [];
+      setPackages(plans);
+      if (!selected && plans[0]) setSelected(plans[0].id);
+    }).catch((error) => {
+      setResult({ message: error.message || "The package list could not be loaded." });
     });
   }, []);
+
+  useEffect(() => {
+    if (!result?.payment || result.payment.status !== "pending") return undefined;
+    let stopped = false;
+    const tick = async () => {
+      try {
+        const data = await paymentStatus(result.payment.id);
+        if (stopped) return;
+        if (data.payment.status !== "pending") {
+          setResult({
+            payment: data.payment,
+            message: data.payment.status === "success"
+              ? "Payment confirmed. Your package is active."
+              : (data.payment.failure_reason || "The payment was not completed."),
+          });
+        }
+      } catch {
+        /* keep the pending state until the next check */
+      }
+    };
+    const timer = setInterval(tick, 4000);
+    return () => {
+      stopped = true;
+      clearInterval(timer);
+    };
+  }, [result?.payment?.id, result?.payment?.status]);
 
   const onSubmit = async (event) => {
     event.preventDefault();
     setSubmitting(true);
     setResult(null);
-
     try {
-      const payload = { package_id: selected, method };
-      if (method === "mpesa" || method === "airtel") payload.phone = phone;
-
-      const { data } = await api.post("/payments/initiate", payload);
-
-      if (method === "stripe" && data.checkout_url) {
-        window.location.href = data.checkout_url;
-        return;
-      }
-
-      const payment = data.payment || data;
-      setResult({
-        success: true,
-        payment,
-        message: data.message || "Payment received. Your package is now active.",
-      });
-
-      clearTimeout(redirectTimer.current);
-      redirectTimer.current = setTimeout(() => navigate("/payments"), 3000);
-    } catch (err) {
-      setResult({
-        success: false,
-        message: err.response?.data?.error || "Payment failed",
-      });
+      const data = await startPayment({ packageId: selected, method, phone });
+      setResult({ payment: data.payment, message: data.message });
+    } catch (error) {
+      setResult({ message: error.message || "Payment failed" });
     } finally {
       setSubmitting(false);
     }
   };
 
   const selectedPkg = packages.find((plan) => plan.id === selected);
-  const methods = [
-    { id: "mpesa", label: "M-Pesa", hint: "STK push" },
-    { id: "airtel", label: "Airtel Money", hint: "Phone prompt" },
-    { id: "stripe", label: "Card", hint: "Stripe" },
-    { id: "cash", label: "Cash", hint: "Recorded" },
-  ];
+  const status = result?.payment?.status;
 
   return (
     <div className="max-w-2xl space-y-8">
-      <PageHeader title="Make a payment" lede="Pay for a package with mobile money, card, or cash." />
+      <PageHeader title="Make a payment" lede="M-Pesa and Airtel Money prompts are in Kenyan shillings. The package starts only after the payment is confirmed." />
 
       <form onSubmit={onSubmit} className="card space-y-5">
         <div>
@@ -87,7 +91,7 @@ export default function Payment() {
 
         <fieldset>
           <legend className="label">Payment method</legend>
-          <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2">
             {methods.map((item) => (
               <button
                 type="button"
@@ -105,25 +109,17 @@ export default function Payment() {
           </div>
         </fieldset>
 
-        {(method === "mpesa" || method === "airtel") && (
-          <div>
-            <label className="label" htmlFor="phone">
-              {method === "mpesa" ? "M-Pesa phone number" : "Airtel phone number"}
-            </label>
-            <input id="phone" className="input" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="254712345678" inputMode="tel" required />
-            <p className="mt-1.5 text-xs text-ink-faint">
-              {method === "mpesa"
-                ? "You will get an STK push on this number."
-                : "Approve the Airtel Money prompt on your phone."}
-            </p>
-          </div>
-        )}
-
-        {method === "stripe" && (
-          <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-950">
-            Card payments open Stripe’s secure checkout when a checkout link is available.
-          </div>
-        )}
+        <div>
+          <label className="label" htmlFor="phone">
+            {method === "mpesa" ? "M-Pesa phone number" : "Airtel Money phone number"}
+          </label>
+          <input id="phone" className="input" value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="0712345678" inputMode="tel" autoComplete="tel" required />
+          <p className="mt-1.5 text-xs text-ink-faint">
+            {method === "mpesa"
+              ? "Safaricom sends an STK push to this number. Enter your M-Pesa PIN to approve it."
+              : "IntaSend sends an Airtel Money prompt to this number."}
+          </p>
+        </div>
 
         {selectedPkg && (
           <div className="space-y-1 rounded-2xl bg-paper p-4 text-sm">
@@ -138,15 +134,21 @@ export default function Payment() {
         )}
 
         {result && (
-          <div role="status" className={`rounded-xl px-3 py-3 text-sm ${result.success ? "bg-signal-50 text-signal-800" : "bg-red-50 text-red-800"}`}>
-            {result.success
-              ? `${result.message}${result.payment?.reference ? ` Ref: ${result.payment.reference}` : ""}`
-              : result.message}
+          <div
+            role="status"
+            className={`rounded-xl px-3 py-3 text-sm ${
+              status === "success" ? "bg-signal-50 text-signal-800" : status === "failed" || !result.payment ? "bg-red-50 text-red-800" : "bg-amber-50 text-amber-950"
+            }`}
+          >
+            <p>{result.message}</p>
+            {result.payment?.reference && <p className="mt-1 font-mono text-xs">Ref: {result.payment.reference}</p>}
+            {status === "pending" && <p className="mt-1">Waiting for confirmation. This page checks again every few seconds.</p>}
+            {status === "success" && <p className="mt-2"><Link className="link" to="/payments">View payment history</Link></p>}
           </div>
         )}
 
-        <button disabled={submitting || !selectedPkg} className="btn-primary w-full">
-          {submitting ? "Processing…" : `Pay ${kes(selectedPkg?.price || 0)}`}
+        <button disabled={submitting || !selectedPkg || status === "pending"} className="btn-primary w-full">
+          {submitting ? "Sending prompt…" : status === "pending" ? "Waiting for confirmation…" : `Pay ${kes(selectedPkg?.price || 0)}`}
         </button>
       </form>
     </div>

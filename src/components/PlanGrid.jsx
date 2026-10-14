@@ -45,7 +45,7 @@ export default function PlanGrid({ mode = "public" }) {
           `${plan.speed_mbps} Mbps`,
           plan.data_limit_gb ? `${plan.data_limit_gb} GB data` : "Unlimited data",
           `${plan.duration_days} day${plan.duration_days === 1 ? "" : "s"} of access`,
-          "M-Pesa, Airtel Money, card, or cash",
+          "M-Pesa or Airtel Money",
         ];
         const actionClass = `${featured ? "btn-light" : "btn-primary"} mt-6 w-full`;
         return (

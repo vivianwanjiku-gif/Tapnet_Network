@@ -74,7 +74,7 @@ function SiteFooter() {
         <div>
           <Logo tone="light" />
           <p className="mt-4 max-w-sm text-sm leading-6 text-mist">
-            Affordable prepaid internet for homes and small businesses in Kenya. Pay with M-Pesa, watch your usage, and renew when you need to.
+            Affordable prepaid internet for homes and small businesses in Kenya. Pay with M-Pesa or Airtel Money, watch your usage, and renew when you need to.
           </p>
         </div>
         <div>

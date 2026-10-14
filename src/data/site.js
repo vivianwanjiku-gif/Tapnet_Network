@@ -24,7 +24,7 @@ export const coverageTowns = [
 export const reasons = [
   {
     title: "Pay the way Kenya pays",
-    body: "M-Pesa, Airtel Money, card, or cash. An STK push on the number you enter, then the package shows in your account.",
+    body: "M-Pesa through Safaricom, or Airtel Money through IntaSend. The package starts only after the payment is confirmed.",
   },
   {
     title: "A price for the week you are having",
@@ -57,7 +57,7 @@ export const steps = [
   {
     n: "02",
     title: "Approve the payment",
-    body: "Pay with M-Pesa or Airtel Money on your phone, use a card, or record cash. You get a TapNet reference either way.",
+    body: "Approve the M-Pesa or Airtel Money prompt on your phone. The package stays off until that payment is confirmed.",
   },
   {
     n: "03",
@@ -87,7 +87,7 @@ export const stories = [
 export const faqs = [
   {
     q: "How do I pay?",
-    a: "From your account, choose a package and pay with M-Pesa, Airtel Money, card, or cash. Mobile money asks you to approve a prompt on the phone number you enter.",
+    a: "From your account, choose a package and pay with M-Pesa or Airtel Money. You approve a prompt on your phone. The package starts after Safaricom or IntaSend confirms the payment.",
   },
   {
     q: "Is there a contract?",
